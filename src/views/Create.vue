@@ -1,0 +1,74 @@
+<template>
+  <div id="row">
+    <div class="col s6 offset-s3">
+      <h1>Let´s create task</h1>
+      <form @submit.prevent="submitHandler">
+        <div class="input-field">
+          <input v-model="title" id="title" type="text" class="validate" required>
+          <label for="title">Title</label>
+        </div>
+
+        <div class="chips" ref="chips"></div>
+
+        <div class="input-field">
+          <textarea v-model="description" id="description" class="materialize-textarea"></textarea>
+          <label for="description">Description</label>
+          <span class="character-counter" style="float: right; font-size: 12px;">{{description.length}}/2048</span>
+        </div>
+
+        <input  type="text" ref="datepicker">
+        <button style="background: #883ca3;" class="btn" type="submit">Create task</button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'Home',
+  components: {
+  },
+  mounted() {
+    this.chips = window.M.Chips.init(this.$refs.chips, {
+      placeholder: 'Tags of tasks'
+    })
+    this.date = window.M.Datepicker.init(this.$refs.datepicker, {
+      format: 'dd.mm.yyyy',
+      defaultDate: new Date(),
+      setDefaultDate: true
+    });
+  },
+  data: () => ({
+    description: '',
+    title: '',
+    chips: null,
+    date: null
+  }),
+  methods: {
+    submitHandler() {
+      const task = {
+        title: this.title,
+        description: this.description,
+        id: Date.now(),
+        status: 'Active',
+        tags: this.chips.chipsData,
+        date: this.date.date
+      }
+      this.$store.dispatch('createTask', task)
+      this.$router.push('/list')
+    }
+  },
+  destroyed() {
+    if (this.date && this.date.destroy) {
+      this.date.destroy()
+    }
+    if (this.chips && this.chips.destroy) {
+      this.chips.destroy()
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+</style>
